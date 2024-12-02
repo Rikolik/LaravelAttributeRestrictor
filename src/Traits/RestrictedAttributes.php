@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Traits;
+namespace Enriko\LaravelAttributeRestrictor\Traits;
 
 trait RestrictedAttributes {
     /**
