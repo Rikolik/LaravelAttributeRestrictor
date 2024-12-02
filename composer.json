@@ -1,0 +1,29 @@
+{
+    "name": "enriko/laravel-attribute-restrictor",
+    "description": "For Laravel. Easy way to restrict access to specified attributes in a Model",
+    "keywords": [
+        "laravel",
+        "permission",
+        "permissions",
+        "roles",
+        "security",
+        "cast",
+        "casting"
+    ],
+    "autoload": {
+        "psr-4": {
+            "Enriko\\LaravelAttributeRestrictor\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Henrique Lopes Ciecielski",
+            "email": "henriquelc000@gmail.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^8.1",
+        "illuminate/support": "^11.34"
+    }
+}
