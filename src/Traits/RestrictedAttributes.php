@@ -102,6 +102,7 @@ trait RestrictedAttributes {
 
     private function getReplacedText()
     {
-        return 'Restricted';
+        // return 'Restricted';
+        return config('restrictedText');
     }
 }
