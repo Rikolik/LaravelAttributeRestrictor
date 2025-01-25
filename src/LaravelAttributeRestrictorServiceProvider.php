@@ -12,8 +12,8 @@ class LaravelAttributeRestrictorServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->mergeConfigFrom(
-            __DIR__ . '/../config/restriction.php',
-            'restriction' // Config key
+            __DIR__ . '/../config/enriko/attribute-restriction.php',
+            'enriko.attribute-restriction' // Config key
         );
     }
 
@@ -23,7 +23,7 @@ class LaravelAttributeRestrictorServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->publishes([
-            __DIR__ . '/../config/restriction.php' => config_path('restriction.php'),
+            __DIR__ . '/../config/enriko/attribute-restriction.php' => config_path('enriko/attribute-restriction.php'),
         ], 'config');
     }
 }

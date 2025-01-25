@@ -140,6 +140,6 @@ trait RestrictedAttributes {
 
     private function getReplacedText()
     {
-        return config('restrictedText');
+        return config('enriko.attribute-restriction.restrictedText');
     }
 }
