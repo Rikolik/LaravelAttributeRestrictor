@@ -15,6 +15,13 @@
             "Enriko\\LaravelAttributeRestrictor\\": "src/"
         }
     },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Enriko\\LaravelAttributeRestrictor"
+            ]
+        }
+    },
     "authors": [
         {
             "name": "Henrique Lopes Ciecielski",
