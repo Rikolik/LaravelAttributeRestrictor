@@ -17,7 +17,7 @@ trait RestrictedAttributes {
 
     /**
      * Global restriction for the entire model. If the return (either bool or the callable's return)
-     * is false, all attributes will be replaced by the text set on RESTRICTED_REPLACEMENT
+     * is false, all attributes will be replaced by the text set on restrictedText
      * @return callable|bool The callable MUST return a bool, else the restriction might have unexpected
      * behavior due to typecasting.
      */
@@ -34,33 +34,72 @@ trait RestrictedAttributes {
     public static function getAttributeRestrictionsArray() : array
     {
         return [];
+        // Examples
         // return [
         //     'id' => false, // will always restrict
         //     'name' => fn() => rand() % 2 === 0,
         // ];
     }
 
-    public function getAttribute($key)
+    /**
+     * Use's the original attributesToArray, then check if the (already cast) attributes
+     * need to be treated.
+     * It get the attributes first, because the original method already uses the "hidden"
+     * attribute, so it's overall less unecessary loops.
+     */
+    public function attributesToArray()
     {
-        // Check if global restriction's condition is false
-        if ($this->isGloballyRestricted()) {
-            return $this->getReplacedText();
-        }
-    
-        // Check if specific attribute's condition is false (array)
-        if ($this->isAttributeRestrictedByArray($key)) {
-            return $this->getReplacedText();
+        $attributes = parent::attributesToArray();
+
+        foreach ($attributes as $key => &$value)
+        {
+            // If the attribute should be restricted, tries to restrict it
+            if ($this->tryRestriction($key))
+                $value = $this->getReplacedText();
         }
 
-        // Check if specific attribute's condition is false
-        if ($this->isAttributeRestricted($key)) {
+        return $attributes;
+    }
+
+    public function getAttributeValue($key)
+    {
+        if ($this->tryRestriction($key)) {
             return $this->getReplacedText();
         }
 
         // Return the attribute, unaltered
-        return parent::getAttribute($key);
+        return parent::getAttributeValue($key);
     }
  
+    /**
+     * Checks all types of restriction
+     */
+    private function tryRestriction($key): bool
+    {
+        // Check if it should be restricted first, to get it out of the way
+        if (!$this->shouldBeRestricted($key)) {
+            // Return the attribute, unaltered
+            return false;
+        }
+
+        // Check if global restriction's condition is false
+        if ($this->isGloballyRestricted()) {
+            return true;
+        }
+    
+        // Check if specific attribute's condition is false (array)
+        if ($this->isAttributeRestrictedByArray($key)) {
+            return true;
+        }
+
+        // Check if specific attribute's condition is false
+        if ($this->isAttributeRestricted($key)) {
+            return true;
+        }
+
+        return false;
+    }
+
     private function isGloballyRestricted(): bool
     {
         $globalRestrictor = $this->getGlobalRestriction();
@@ -72,21 +111,18 @@ trait RestrictedAttributes {
     
     private function isAttributeRestrictedByArray(string $key): bool
     {
-        if (!$this->shouldBeRestricted($key))
-            return false;
-
         $attributeRestrictor = $this->getAttributeRestrictionsArray();
 
+        if (!array_key_exists($key, $attributeRestrictor))
+            return false;
+    
         return is_callable($attributeRestrictor[$key])
             ? call_user_func($attributeRestrictor[$key]) === false
             : !$attributeRestrictor[$key];
     }
 
     private function isAttributeRestricted(string $key): bool
-    {
-        if (!$this->shouldBeRestricted($key))
-            return false;
-    
+    {    
         $attributeRestrictor = $this->getAttributeRestrictions($key);
     
         return is_callable($attributeRestrictor)
@@ -94,7 +130,9 @@ trait RestrictedAttributes {
             : !$attributeRestrictor;
     }
 
-    // Check if attribute is on getRestrictedAttributes
+    /**
+     * Check if attribute is on getRestrictedAttributes
+     */ 
     private function shouldBeRestricted(string $key): bool
     {
         return in_array($key, $this->getRestrictedAttributes());
@@ -102,7 +140,6 @@ trait RestrictedAttributes {
 
     private function getReplacedText()
     {
-        // return 'Restricted';
         return config('restrictedText');
     }
 }
